@@ -12,16 +12,16 @@ EventBus.addEventListener("roverCommand", function(event, command) {
     }
 });
 
-EventBus.addEventListener("resetLocation", function(event) {
-    var location = [
-        (event.target.location[0] + event.target.grid[0]) % event.target.grid[0],
-        (event.target.location[1] + event.target.grid[1]) % event.target.grid[1]
+EventBus.addEventListener("move", function(event, command) {
+    var location = calculateMove(event, command);
+    var wrappedLocation = [
+        (location[0] + event.target.grid[0]) % event.target.grid[0],
+        (location[1] + event.target.grid[1]) % event.target.grid[1]
     ];
-
-    EventBus.dispatch("roverLocationUpdated", event.target, location);
+    EventBus.dispatch("moveValidated", event.target, wrappedLocation);
 });
 
-EventBus.addEventListener("move", function(event, command) {
+function calculateMove(event, command) {
     var xIncrease = 0,
         yIncrease = 0;
     if (event.target.direction === 'N') {
@@ -37,9 +37,20 @@ EventBus.addEventListener("move", function(event, command) {
         xIncrease *= -1;
         yIncrease *= -1;
     }
+
     var location = event.target.location;
-    location[0] += xIncrease;
-    location[1] += yIncrease;
+    return [
+        location[0] + xIncrease,
+        location[1] + yIncrease
+    ];
+}
+
+EventBus.addEventListener("moveValidated", function(event, location) {
+    for (var i = 0; i < event.target.obstacles.length; i++) {
+        if (JSON.stringify(event.target.obstacles[i]) == JSON.stringify(location)) {
+            return EventBus.dispatch("collitionDetected", event.target, location);
+        }                          
+    }
     EventBus.dispatch("roverLocationUpdated", event.target, location);
 });
 
@@ -60,6 +71,10 @@ EventBus.addEventListener("roverLocationUpdated", function(event, location) {
 
 EventBus.addEventListener("roverDirectionUpdated", function(event, direction) {
     event.target.direction = direction;
+});
+
+EventBus.addEventListener("collitionDetected", function(event, location) {
+    event.target.runCommands = false;
 });
 
 function directionAsNumber(direction, directions) {

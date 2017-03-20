@@ -158,6 +158,33 @@ describe('Mars Rover', function() {
         });
     });
 
+    describe('Multiple commands like a game', function() {
+        it('large amount of commands', function() {
+            var mr = new MarsRover([0, 0], 'S', [10, 10], [
+                [0, 1],
+                [0, 9]
+            ]);
+            mr.commands(['l', 'f', 'f', 'f', 'r', 'f', 'f', 'f', 'l', 'b']);
+            expect(mr.location).toEqual([2, 3]);
+        });
+        it('moving across the top row', function() {
+            var mr = new MarsRover([5, 0], 'E', [10, 10], [
+                [0, 1],
+                [0, 9]
+            ]);
+            mr.commands(['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f']);
+            expect(mr.location).toEqual([4, 0]);
+        });
+        it('moving across the top row backwards', function() {
+            var mr = new MarsRover([5, 0], 'E', [10, 10], [
+                [0, 1],
+                [0, 9]
+            ]);
+            mr.commands(['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b']);
+            expect(mr.location).toEqual([6, 0]);
+        });
+    });
+
     // TODO Implement obstacle detection before each move to a new square. If a given sequence of commands encounters an obstacle, the rover moves up to the last possible point and reports the obstacle.
     // TODO Check whether object values are correct (location = number array, direction = ['N'|'S'|'E'|'W'], grid = number array)
     // TODO Ignore direction and commands case (lower/upper)

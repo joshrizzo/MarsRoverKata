@@ -5,6 +5,7 @@ function MarsRover(location, direction, grid, obstacles) {
     this.grid = (grid === undefined) ? [100, 100] : grid;
     this.obstacles = (obstacles === undefined) ? [] : obstacles;
     this.directions = ['N', 'E', 'S', 'W'];
+    this.runCommands = true;
 
     this.commands = function(commands) {
         if (commands === undefined) { // Getter
@@ -12,9 +13,10 @@ function MarsRover(location, direction, grid, obstacles) {
         } else { // Setter
             for (var index = 0; index < commands.length; index++) {
                 var command = commands[index];
-                EventBus.dispatch('roverCommand', this, command);
+                if (this.runCommands) {
+                    EventBus.dispatch('roverCommand', this, command);
+                }
             }
-            EventBus.dispatch("resetLocation", this);
             this.commandsArray = commands;
         }
     };
